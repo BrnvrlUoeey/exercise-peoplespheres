@@ -1,0 +1,51 @@
+version: '3'
+services:
+  nginx_service:
+    image: nginx:1.21.4
+    container_name: nginx
+    restart: 'unless-stopped'
+    hostname: exercise-docker.local
+    # Expose nginx port 443 to host at port 9443
+    ports:
+      - "8080:80"
+      - "443:443"
+    # Setup the nginx configuration tu use php-fpm service
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    depends_on:
+      - php_fpm
+    links:
+      - php_fpm
+    # Setup a self-signed certificate
+#    secrets:
+#      self_signed_cert:
+#        file: /etc/ssl/certs/nginx-selfsigned.crt
+        #external: true
+    # other stuff
+#    environment:
+#      - NGINX_HOST=exercice.docker.local
+#      - NGINX_PORT=80
+#      - TIMEZONE=Europe/paris
+    volumes:
+      #- /var/www/html/PeopleSpheres:/usr/share/nginx/html/PeopleSpheres
+      - /var/www/html/PeopleSpheres:/usr/share/nginx/html
+      - /var/www/html/PeopleSpheres/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /var/www/html/PeopleSpheres/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /var/log/nginx:/var/log/nginx
+      - /var/www/html/PeopleSpheres/certificate/nginx-selfsigned.crt:/etc/ssl/certs/nginx-selfsigned.crt
+      - /var/www/html/PeopleSpheres/certificate/nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key
+    command: [nginx-debug, '-g', 'daemon off;']
+
+  php_fpm:
+    image: php:8.1.2-fpm
+    container_name: php_fpm
+    restart: 'unless-stopped'
+    build:
+      context: .
+      dockerfile: php_fpm.Dockerfile
+    volumes:
+      - /var/www/html/PeopleSpheres:/usr/share/nginx/html
+
+
+
