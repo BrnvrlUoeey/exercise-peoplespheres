@@ -28,7 +28,6 @@ services:
 #      - NGINX_PORT=80
 #      - TIMEZONE=Europe/paris
     volumes:
-      #- /var/www/html/PeopleSpheres:/usr/share/nginx/html/PeopleSpheres
       - /var/www/html/PeopleSpheres:/usr/share/nginx/html
       - /var/www/html/PeopleSpheres/nginx/nginx.conf:/etc/nginx/nginx.conf
       - /var/www/html/PeopleSpheres/nginx/conf.d:/etc/nginx/conf.d:ro

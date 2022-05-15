@@ -44,6 +44,14 @@ class InputParam
     }
 
     /**
+     * @return string
+     */
+    public function getOriginalValueQuoted(): string
+    {
+        return addQuotes(spaceLess(strtolower($this->originalValue)));
+    }
+
+    /**
      * @param string $value
      */
     public function setOriginalValue(string $value)
@@ -159,28 +167,32 @@ class InputParam
     }
 
     /*
-     * Returns first x words from $this->processedValue
+     * Returns "first" x words from $this->processedValue
      */
     public function firstWords(int $n): InputParam
     {
         $this->setReturnMethodResult(false);
         $words = $this->getWords();
-        $firstWords = array_slice($words, 0, $n);
+        if ($n > 0) {
+            $firstWords = array_slice($words, 0, $n); // Keeps $n words from the left
+        } elseif ($n < 0) {
+            $firstWords = array_slice($words, $n); // Keeps $n words from the right
+        }
         $this->setProcessedValue(implode(' ', $firstWords));
         return $this;
     }
 
     /*
-     * Returns last x words from $this->processedValue
+     * Returns "last" x words from $this->processedValue
      */
     public function lastWords(int $n): InputParam
     {
         $this->setReturnMethodResult(false);
         $words = $this->getWords();
         if ($n > 0) {
-            $lastWords = array_slice($words, count($words) - ($n + 1));
+            $lastWords = array_slice($words, count($words) - ($n + 1)); // Skip $n first words
         } elseif ($n < 0) {
-            $lastWords = array_slice($words, 0, count($words) - abs($n));
+            $lastWords = array_slice($words, 0, count($words) - abs($n)); // Skip $n last words
         }
         $this->setProcessedValue(implode(' ', $lastWords));
         return $this;
@@ -207,7 +219,9 @@ class InputParam
         // Single method call, execute it
         if (strlen($chain) <= strlen($method) + strlen($parameter) + 9) {
 
-            echo '<p>SINGLE CALL</p>';
+            echo '<p>SINGLE CALL<br />';
+            echo "\$method = $method<br />";
+            echo "\$parameter = $parameter</p>";
 
             $result = $this->$method($parameter);
         }
@@ -218,12 +232,14 @@ class InputParam
 
             $calls = ['chain' => $chain,
                     'inputIndex' => $inputIndex,
-                    'last_method' => $method,
-                    'last_parameter' => $parameter];
+                    'last_method_matched' => $method,
+                    'last_parameter_matched' => $parameter];
             $result = $this->chainedCall($calls);
         }
 
-        echo "<br /><br />Dump de \$this->getProcessedValue() AFTER dans InputParam::dispatch()<br />";
+        echo "<br /><br />Dump de \$this->getProcessedValue() / \$result AFTER dans InputParam::dispatch()<br />";
+        echo "<br />";
+        var_dump($result);
         echo "<br />";
         var_dump($this->getProcessedValue());
         echo "</p>";
@@ -239,13 +255,12 @@ class InputParam
             $processedValue = $this->getProcessedValue();
             // update global offset position : pass method call position + replacement expression length
             $offset = $matches[0][1] + strlen($processedValue);
-            return $processedValue;
+            return addQuotes(spaceLess(strtolower($processedValue)));
         }
     }
 
     protected function chainedCall(array $calls)
     {
-
         echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
         echo "<br />";
         var_dump($this->getProcessedValue());
@@ -265,10 +280,13 @@ class InputParam
 
             foreach ($matches['method'] as $index => $method) {
 
-                echo "<p>\$index = $index<br />";
-                echo "\$method = $method</p>";
+                $parameter = $matches['parameter'][$index];
 
-                $result = $this->$method($matches['parameter'][$index]);
+                echo "<p>\$index = $index<br />";
+                echo "\$method = $method<br />";
+                echo "\$parameter = $parameter</p>";
+
+                $result = $this->$method($parameter);
 
                 echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
                 echo "<br />";
@@ -278,7 +296,6 @@ class InputParam
                 echo "<br />";
                 var_dump($this->getWords());
                 echo "</p>";
-
             }
             return $result;
         }

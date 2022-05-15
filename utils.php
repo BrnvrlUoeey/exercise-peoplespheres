@@ -22,3 +22,13 @@ function validateEmail(string $email): mixed
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
+
+function addQuotes(string $string): string
+{
+    return "'" . $string . "'";
+}
+
+function spaceLess(string $string): string
+{
+    return str_replace(' ', '', $string);
+}
