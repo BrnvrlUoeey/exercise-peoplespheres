@@ -13,7 +13,7 @@ class InputParam
     protected string $originalValue;
     protected string $processedValue;
 
-    public function __construct(protected string $name, string $value)
+    public function __construct(protected string $name, string $value, protected bool $debug = false)
     {
         $this->originalValue = $value;
         $this->processedValue = $value;
@@ -138,16 +138,21 @@ class InputParam
     {
         $this->setReturnMethodResult(false);
         $words = $this->getWords();
-        echo "<p>DANS InputParam::eachWordFirstChars()<br />
+
+        if ($this->debug) {
+            echo "<p>DANS InputParam::eachWordFirstChars()<br />
                  Dump de \$words :<br />";
-        var_dump($words);
-        echo "</p>";
+            var_dump($words);
+            echo "</p>";
+        }
 
         $firstChars = array_map(fn($value): string => substr($value, 0, $n), $words);
 
-        echo "<p>Dump de \$firstChars :<br />";
-        var_dump($firstChars);
-        echo "</p>";
+        if ($this->debug) {
+            echo "<p>Dump de \$firstChars :<br />";
+            var_dump($firstChars);
+            echo "</p>";
+        }
 
         $this->setProcessedValue(implode('', $firstChars));
         return $this;
@@ -203,13 +208,15 @@ class InputParam
         global $offset;
         $this->resetProcessedValue();
 
-        echo "<p>";
-        echo "Dump de \$matches dans InputParam::dispatch()<br />";
-        var_dump($matches);
-        echo "<br /><br />Dump de \$this->getProcessedValue() BEFORE dans InputParam::dispatch()<br />";
-        echo "<br />";
-        var_dump($this->getProcessedValue());
-        echo "<br />";
+        if ($this->debug) {
+            echo "<p>";
+            echo "Dump de \$matches dans InputParam::dispatch()<br />";
+            var_dump($matches);
+            echo "<br /><br />Dump de \$this->getProcessedValue() BEFORE dans InputParam::dispatch()<br />";
+            echo "<br />";
+            var_dump($this->getProcessedValue());
+            echo "<br />";
+        }
 
         $chain = $matches[0][0];
         $inputIndex = $matches['input'][0];
@@ -219,16 +226,16 @@ class InputParam
         // Single method call, execute it
         if (strlen($chain) <= strlen($method) + strlen($parameter) + 9) {
 
-            echo '<p>SINGLE CALL<br />';
-            echo "\$method = $method<br />";
-            echo "\$parameter = $parameter</p>";
+            echo ifDebug('<p>SINGLE CALL<br />');
+            echo ifDebug("\$method = $method<br />");
+            echo ifDebug("\$parameter = $parameter</p>");
 
             $result = $this->$method($parameter);
         }
         // Chained methods calls, decompose for sequential execution
         else {
 
-            echo '<p>CHAINED CALLS</p>';
+            echo ifDebug('<p>CHAINED CALLS</p>');
 
             $calls = ['chain' => $chain,
                     'inputIndex' => $inputIndex,
@@ -237,12 +244,14 @@ class InputParam
             $result = $this->chainedCall($calls);
         }
 
-        echo "<br /><br />Dump de \$this->getProcessedValue() / \$result AFTER dans InputParam::dispatch()<br />";
-        echo "<br />";
-        var_dump($result);
-        echo "<br />";
-        var_dump($this->getProcessedValue());
-        echo "</p>";
+        if ($this->debug) {
+            echo "<br /><br />Dump de \$this->getProcessedValue() / \$result AFTER dans InputParam::dispatch()<br />";
+            echo "<br />";
+            var_dump($result);
+            echo "<br />";
+            var_dump($this->getProcessedValue());
+            echo "</p>";
+        }
 
         // For methods that directly return evaluated result in expression
         if ($this->isReturnMethodResult()) {
@@ -261,41 +270,48 @@ class InputParam
 
     protected function chainedCall(array $calls)
     {
-        echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
-        echo "<br />";
-        var_dump($this->getProcessedValue());
-        echo "</p>";
-        echo "<hr /><p>Dump de \$this->getWords() dans InputParam::chainedCall()<br />";
-        echo "<br />";
-        var_dump($this->getWords());
-        echo "</p>";
+        if ($this->debug) {
+            echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
+            echo "<br />";
+            var_dump($this->getProcessedValue());
+            echo "</p>";
+            echo "<hr /><p>Dump de \$this->getWords() dans InputParam::chainedCall()<br />";
+            echo "<br />";
+            var_dump($this->getWords());
+            echo "</p>";
+        }
 
         $return = preg_match_all('#'. Patterns::METHOD_CALL_PATTERN .'#', $calls['chain'], $matches);
 
         if ($return > 0) {
-            echo "<hr /><p>";
-            echo "Dump de \$matches dans InputParam::chainedCall()<br />";
-            var_dump($matches);
-            echo "</p>";
+
+            if ($this->debug) {
+                echo "<hr /><p>";
+                echo "Dump de \$matches dans InputParam::chainedCall()<br />";
+                var_dump($matches);
+                echo "</p>";
+            }
 
             foreach ($matches['method'] as $index => $method) {
 
                 $parameter = $matches['parameter'][$index];
 
-                echo "<p>\$index = $index<br />";
-                echo "\$method = $method<br />";
-                echo "\$parameter = $parameter</p>";
+                echo ifDebug("<p>\$index = $index<br />");
+                echo ifDebug("\$method = $method<br />");
+                echo ifDebug("\$parameter = $parameter</p>");
 
                 $result = $this->$method($parameter);
 
-                echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
-                echo "<br />";
-                var_dump($this->getProcessedValue());
-                echo "</p>";
-                echo "<hr /><p>Dump de \$this->getWords() dans InputParam::chainedCall()<br />";
-                echo "<br />";
-                var_dump($this->getWords());
-                echo "</p>";
+                if ($this->debug) {
+                    echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
+                    echo "<br />";
+                    var_dump($this->getProcessedValue());
+                    echo "</p>";
+                    echo "<hr /><p>Dump de \$this->getWords() dans InputParam::chainedCall()<br />";
+                    echo "<br />";
+                    var_dump($this->getWords());
+                    echo "</p>";
+                }
             }
             return $result;
         }

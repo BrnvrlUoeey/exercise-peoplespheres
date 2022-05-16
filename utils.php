@@ -32,3 +32,13 @@ function spaceLess(string $string): string
 {
     return str_replace(' ', '', $string);
 }
+
+function ifDebug(string $expr): ?string
+{
+    global $debug;
+    if ($debug) {
+        return $expr;
+    } else {
+        return null;
+    }
+}
