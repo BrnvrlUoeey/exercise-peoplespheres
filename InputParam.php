@@ -112,8 +112,9 @@ class InputParam
         $this->returnMethodResult = $value;
     }
 
-    /*
-     * Return words array from value
+    /**
+     * Returns words array from $this->getProcessedValue()
+     * @return array
      */
     protected function getWords(): array
     {
@@ -121,8 +122,9 @@ class InputParam
         return str_word_count(str_replace('-', ' ', $this->getProcessedValue()), 1);
     }
 
-    /*
-     * Return words count from value
+    /**
+     * Returns words count from $this->getProcessedValue()
+     * @return int
      */
     public function wordsCount(): int
     {
@@ -130,9 +132,11 @@ class InputParam
         return str_word_count(str_replace('-', ' ', $this->getProcessedValue()));
     }
 
-    /*
+    /**
      * Returns a string concatenating
      * each word x first characters from $this->processedValue.
+     * @param int $n
+     * @return $this
      */
     public function eachWordFirstChars(int $n): InputParam
     {
@@ -158,9 +162,11 @@ class InputParam
         return $this;
     }
 
-    /*
+    /**
      * Returns a string concatenating
      * each word x last characters from $this->processedValue.
+     * @param int $n
+     * @return $this
      */
     public function eachWordLastChars(int $n): InputParam
     {
@@ -171,8 +177,10 @@ class InputParam
         return $this;
     }
 
-    /*
-     * Returns "first" x words from $this->processedValue
+    /**
+     * Keeps "first" x words from $this->processedValue
+     * @param int $n
+     * @return $this
      */
     public function firstWords(int $n): InputParam
     {
@@ -187,8 +195,10 @@ class InputParam
         return $this;
     }
 
-    /*
-     * Returns "last" x words from $this->processedValue
+    /**
+     * Keeps "last" x words from $this->processedValue
+     * @param int $n
+     * @return $this
      */
     public function lastWords(int $n): InputParam
     {
@@ -203,6 +213,24 @@ class InputParam
         return $this;
     }
 
+    /**
+     * @php builtin function proxy
+     * Keeps the portion of string specified by the offset and length parameters.
+     * @param int $offset
+     * @param ?int $length
+     * @return $this
+     */
+    public function substr(int $offset, ?int $length = null)
+    {
+        $this->setProcessedValue(substr($this->getProcessedValue(), $offset, $length));
+        return $this;
+    }
+
+    /**
+     * Executes requested string treatment method(s) for this InputParam instance
+     * @param array $matches
+     * @return mixed
+     */
     public function dispatch(array $matches)
     {
         global $offset;
@@ -268,7 +296,12 @@ class InputParam
         }
     }
 
-    protected function chainedCall(array $calls)
+    /**
+     * Executes a chain of string treatment method calls on $this->getProcessedValue()
+     * @param array $calls
+     * @return mixed
+     */
+    protected function chainedCall(array $calls): mixed
     {
         if ($this->debug) {
             echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
@@ -317,6 +350,9 @@ class InputParam
         }
     }
 
+    /**
+     * @return string
+     */
     public function __toString():string
     {
         return $this->getProcessedValue();
