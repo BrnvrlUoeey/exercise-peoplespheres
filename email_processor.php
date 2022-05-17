@@ -1,6 +1,7 @@
 <?php
 require './utils.php';
 require './InputParam.php';
+require './EmailData.php';
 
 ini_set('memory_limit', '1024M');
 const EXPR_EVAL_MAX_ALLOWED_ITERATIONS = 50;
@@ -180,24 +181,28 @@ $fp = fopen($outputFilePath, "w");
 if (is_file($outputFilePath) && is_writable($outputFilePath)) {
     $written = fwrite($fp, "<?php return ($buffer);");
 
+    // logical expression evaluation
     if ($written) {
         $evalResult = include($outputFilePath);
     }
 }
 
-echo "<h2>\$evalResult :</h2> <p><span style='color:red'><b>$evalResult</b></span></p>";
+echo ifDebug("<h2>\$evalResult :</h2> <p><span style='color:red'><b>$evalResult</b></span></p>");
 
 
 /*****************************************************************************
   Result expression file inclusion for evaluation in variable
 *******************************************************************************/
 
-
-
-// logical expression handling
-
-
 // Data object encapsulation
 
+if (!empty($evalResult)) {
+    $attributes = new StdClass();
+    $attributes->value = $evalResult;
+    $dataObject = new EmailData($evalResult, $attributes);
+}
 
 // Data object output
+header("HTTP/2 200 OK");
+header('Content-Type: application/vnd.api+json');
+echo json_encode($dataObject);

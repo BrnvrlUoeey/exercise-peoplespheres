@@ -198,16 +198,28 @@ class InputParam
     /**
      * Keeps "last" x words from $this->processedValue
      * @param int $n
+     * @param bool $intuitive
      * @return $this
      */
-    public function lastWords(int $n): InputParam
+    public function lastWords(int $n, bool $intuitive = false): InputParam
     {
         $this->setReturnMethodResult(false);
         $words = $this->getWords();
-        if ($n > 0) {
-            $lastWords = array_slice($words, count($words) - ($n + 1)); // Skip $n first words
-        } elseif ($n < 0) {
-            $lastWords = array_slice($words, 0, count($words) - abs($n)); // Skip $n last words
+
+        // Intuitive behavior mode (1 to $n indexation mode)
+        if ($intuitive) {
+            if ($n > 0) {
+                $lastWords = array_slice($words, count($words) - $n); // Keeps $n words from the right
+            } elseif ($n < 0) {
+                $lastWords = array_slice($words, 0, $n); // Keeps $n words from the left
+            }
+
+        } else { // Behaves strictly like in given example (0 to $n indexation mode)
+            if ($n > 0) {
+                $lastWords = array_slice($words, count($words) - ($n + 1)); // Skip $n + 1 words from the left
+            } elseif ($n < 0) {
+                $lastWords = array_slice($words, 0, count($words) - (abs($n)+1)); // Skip $n + 1 words from the right
+            }
         }
         $this->setProcessedValue(implode(' ', $lastWords));
         return $this;
@@ -249,16 +261,16 @@ class InputParam
         $chain = $matches[0][0];
         $inputIndex = $matches['input'][0];
         $method = $matches['method'][0];
-        $parameter = $matches['parameter'][0];
+        $parameter1 = $matches['parameter1'][0];
 
         // Single method call, execute it
-        if (strlen($chain) <= strlen($method) + strlen($parameter) + 9) {
+        if (strlen($chain) <= strlen($method) + strlen($parameter1) + 9) {
 
             echo ifDebug('<p>SINGLE CALL<br />');
             echo ifDebug("\$method = $method<br />");
-            echo ifDebug("\$parameter = $parameter</p>");
+            echo ifDebug("\$parameter1 = $parameter1</p>");
 
-            $result = $this->$method($parameter);
+            $result = $this->$method($parameter1);
         }
         // Chained methods calls, decompose for sequential execution
         else {
@@ -268,7 +280,7 @@ class InputParam
             $calls = ['chain' => $chain,
                     'inputIndex' => $inputIndex,
                     'last_method_matched' => $method,
-                    'last_parameter_matched' => $parameter];
+                    'last_parameter_matched' => $parameter1];
             $result = $this->chainedCall($calls);
         }
 
@@ -327,13 +339,32 @@ class InputParam
 
             foreach ($matches['method'] as $index => $method) {
 
-                $parameter = $matches['parameter'][$index];
+                $paramCount = 0;
+                if (isset($matches['parameter1'])) {
+                    $paramCount = 1;
+                    $parameter1 = $matches['parameter1'][$index];
+                }
+                if (isset($matches['parameter2'])) {
+                    $paramCount = 2;
+                    $parameter2 = $matches['parameter2'][$index];
+                }
 
                 echo ifDebug("<p>\$index = $index<br />");
                 echo ifDebug("\$method = $method<br />");
-                echo ifDebug("\$parameter = $parameter</p>");
+                echo ifDebug("\$parameter1 = $parameter1</p>");
+                echo ifDebug("\$parameter2 = $parameter2</p>");
 
-                $result = $this->$method($parameter);
+                switch ($paramCount) {
+                    case 0:
+                        $result = $this->$method();
+                        break;
+                    case 1:
+                        $result = $this->$method($parameter1);
+                        break;
+                    case 2:
+                        $result = $this->$method($parameter1, $parameter2);
+                        break;
+                }
 
                 if ($this->debug) {
                     echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";

@@ -71,7 +71,7 @@
         </fieldset>
         <fieldset>
             <legend>Pattern expression to drive interpretation of input texts.</legend>
-            <textarea name="expression" cols="75" rows="4" />input1.eachWordFirstChars(1) ~ '.' ~ (input2.wordsCount() > 1 ? input2.lastWords(-1).eachWordFirstChars(1) ~ input2.lastWords(1) : input2) ~ '@' ~ input3 ~ '.' ~ input4 ~ '.' ~ input5</textarea>
+            <textarea name="expression" cols="75" rows="4" />input1.eachWordFirstChars(1) ~ '.' ~ (input2.wordsCount() > 1 ? input2.lastWords(-1, false).eachWordFirstChars(1) ~ input2.lastWords(1) : input2) ~ '@' ~ input3 ~ '.' ~ input4 ~ '.' ~ input5</textarea>
             <label for="expression">Specify your pattern expression here</label>
 
             <p>There are some methods available on Input fields, which are treated as objects. Those can be chained.
@@ -98,7 +98,7 @@
             </p>
             <input type="submit" name="add-input" value="process form" />
             <p>
-                <input type="checkbox" name="debug" value="debug" checked="checked"/>
+                <input type="checkbox" name="debug" value="debug" />
                 <label for="debug">Debug mode (verbose output)</label>
             </p>
         </fieldset>
