@@ -28,13 +28,12 @@ Laravel would provide a better and more extensible "real world" framework soluti
 
 "Why do we want to avoid using the eval() function ?"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The eval function in PHP and other languages is known to be a secutity hole because it allows no control on what is evaluated and executed.
+The eval function in PHP and other languages is known to be a security hole because it allows no control on what is evaluated and executed.
 It can virtually be any interpretable instructions and therefore could have imprevisible results in case input data has not been perfectly filtered.
 
 Also, the aim of this exercise is about the way to handle composition of a custom functionnal vocabulary which gets interpreted
 in a fully customisable maneer. I did'nt saw clearly that concern at first, and I still wonder if my choice of using PHP inclusion
-interpretation mechanism is entirely compliant with this second requirement.
-I think it is with the first security concern.
+interpretation mechanism is entirely compliant with this second requirement. I think it is at least with the first security concern.
 
 Other technical considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

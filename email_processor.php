@@ -12,23 +12,6 @@ $concatOperator = '~';
 $evalFilePath = './output';
 $input = $_GET;
 $debug = isset($_GET['debug']);
-//
-//echo "<pre>";
-//var_dump($_GET, $debug);
-//echo "</pre>";
-
-
-//$input = [
-//    'Input1' => 'Jean-Louis',
-//    'Input2' => 'Jean-Charles Mignard',
-//    'Input3' => 'external',
-//    'Input4' => 'peoplespheres.fr',
-//    'Input5' => 'fr',
-//    'expression' => "input1.eachWordFirstChars(1) ~ '.' ~ (input2.wordsCount() > 1 ?
-//    input2.lastWords(-1).eachWordFirstChars(1) ~ input2.lastWords(1) :
-//    input2 ) ~ '@' ~ input3 ~ '.' ~ input4 ~ '.' ~ input5"
-//];
-
 $count = 1;
 $params = [];
 
@@ -39,12 +22,8 @@ $params = [];
 // Foreach Input parameter
 foreach ($input as $name => $val) {
 
-    echo ifDebug("<p>\$name = <b>$name</b><br />\$val = $val</p>");
-
     if ('expression' === $name && is_string($val)) {
         $expression = $val;
-
-        echo ifDebug("\$expression = $expression<br />");
 
     } elseif (filterVarForEmail($val)) {
 
@@ -61,17 +40,10 @@ foreach ($input as $name => $val) {
         $params[ucfirst($name)] = $param;
     }
     $count++;
-    echo ifDebug("<p>\$count = $count</p><hr />");
 }
 
 // Order parameters
 ksort($params);
-
-if ($debug) {
-    echo "<pre>";
-    var_dump($params);
-    echo "</pre>";
-}
 
 //////////////////////////////////////////////////////////////////////////////
 // EXPRESSION EVALUATION
@@ -195,7 +167,6 @@ echo ifDebug("<h2>\$evalResult :</h2> <p><span style='color:red'><b>$evalResult<
 *******************************************************************************/
 
 // Data object encapsulation
-
 if (!empty($evalResult)) {
     $attributes = new StdClass();
     $attributes->value = $evalResult;
@@ -203,6 +174,9 @@ if (!empty($evalResult)) {
 }
 
 // Data object output
-header("HTTP/2 200 OK");
-header('Content-Type: application/vnd.api+json');
-echo json_encode($dataObject);
+if (!$debug) {
+    header("HTTP/2 200 OK");
+    header('Content-Type: application/vnd.api+json');
+    echo json_encode($dataObject);
+}
+

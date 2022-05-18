@@ -142,22 +142,7 @@ class InputParam
     {
         $this->setReturnMethodResult(false);
         $words = $this->getWords();
-
-        if ($this->debug) {
-            echo "<p>DANS InputParam::eachWordFirstChars()<br />
-                 Dump de \$words :<br />";
-            var_dump($words);
-            echo "</p>";
-        }
-
         $firstChars = array_map(fn($value): string => substr($value, 0, $n), $words);
-
-        if ($this->debug) {
-            echo "<p>Dump de \$firstChars :<br />";
-            var_dump($firstChars);
-            echo "</p>";
-        }
-
         $this->setProcessedValue(implode('', $firstChars));
         return $this;
     }
@@ -315,17 +300,6 @@ class InputParam
      */
     protected function chainedCall(array $calls): mixed
     {
-        if ($this->debug) {
-            echo "<hr /><p>Dump de \$this->getProcessedValue() dans InputParam::chainedCall()<br />";
-            echo "<br />";
-            var_dump($this->getProcessedValue());
-            echo "</p>";
-            echo "<hr /><p>Dump de \$this->getWords() dans InputParam::chainedCall()<br />";
-            echo "<br />";
-            var_dump($this->getWords());
-            echo "</p>";
-        }
-
         $return = preg_match_all('#'. Patterns::METHOD_CALL_PATTERN .'#', $calls['chain'], $matches);
 
         if ($return > 0) {
