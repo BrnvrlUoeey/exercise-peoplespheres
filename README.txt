@@ -73,4 +73,7 @@ but it's not yet fonctionnal : it crashes on the passing of arguments, at this s
 A matter of tweaking annotations vs Symfony auto-wiring, I suppose...
 To gain time, I've built on the tutorial I once did, with no components update.
 Which means it's on API-Platform 2.4, so no PATCH method...
+I brainlessly made multi-target methods for creating and deleting multiple instances of InputParam
+and Expression objects. Theese are not REST/HTTP compliant. They could be treated as
+a PATCH on the collections with API Platform >=2.5.
 
