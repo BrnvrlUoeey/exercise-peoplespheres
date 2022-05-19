@@ -29,24 +29,14 @@ function validateEmailExpression(string $string): mixed
     // Remove quotes
     $string = preg_replace('/"/', '', $string);
     $string = preg_replace("/'/", '', $string);
-    echo "<p>\$string = $string</p>";
-
     // Remove all operators
     $string = preg_replace('/\*|\?|:|\(|\)|=|!|<|>/', '', $string);
-    echo "<p>\$string = $string</p>";
-
     // Remove all spaces
     $string = preg_replace('/\s+/', '', $string);
-    echo "<p>\$string = $string</p>";
-
     // Remove multiple dots
     $string = preg_replace('/\.+/', '.', $string);
-    echo "<p>\$string = $string</p>";
-
     // Remove dots around @
     $string = preg_replace('/\.@\./', '@', $string);
-    echo "<p>\$string = $string</p>";
-
     // Validate remaining characters
     return validateEmail($string);
 }
