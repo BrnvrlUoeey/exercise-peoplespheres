@@ -13,4 +13,9 @@ class Patterns
     const METHOD_CALL_PATTERN = self::JUNCTION_PATTERN . self::METHOD_NAME_PATTERN . self::PARAMETER_PATTERN;
     // Optionnally chained method call
     const FULL_METHOD_CALL_PATTERN = self::INPUT_PATTERN . '(' . self::METHOD_CALL_PATTERN . ')+';
+    // Supported operators
+    const OPERATORS_PATTERN = '[\*\?:()=!<>/]';
+    // Allowed expressions
+    const ALL_ALLOWED_PATTERN = '^('. self::INPUT_PATTERN .'|'. self::FULL_METHOD_CALL_PATTERN .'|'. self::OPERATORS_PATTERN .'| \s)*$';
+
 }

@@ -150,6 +150,12 @@ $evalResult = false;
 $outputFilePath = "$evalFilePath/interpolation_result.php";
 $fp = fopen($outputFilePath, "w");
 
+// Validation of string before its evaluation
+if (false === validateEmailExpression($buffer)) {
+    throw new InvalidArgumentException('Invalid characters found in Expression before evaluation.', 1);
+    exit();
+}
+
 if (is_file($outputFilePath) && is_writable($outputFilePath)) {
     $written = fwrite($fp, "<?php return ($buffer);");
 
